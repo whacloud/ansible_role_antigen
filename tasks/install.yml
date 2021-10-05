@@ -8,6 +8,14 @@
       - tar
       - gzip
     state: present
+  when: ansible_distribution != 'MacOSX'
+
+- name: install dependencies - MacOSX
+  package:
+    name:
+      - gnu-tar
+    state: present
+  when: ansible_distribution == 'MacOSX'
 
 - name: create download directory
   file:
@@ -35,6 +43,9 @@
 
 - name: install Antigen
   become: yes
+  environment:
+    - PATH: '/usr/local/opt/gnu-tar/libexec/gnubin:/opt/homebrew/opt/gnu-tar/libexec/gnubin:{{ ansible_env.PATH }}'
+      when: ansible_distribution == 'MacOSX'
   unarchive:
     src: '{{ antigen_download_dir }}/{{ antigen_local_filename }}'
     remote_src: yes
